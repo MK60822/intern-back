@@ -1,39 +1,29 @@
-name: Deploy Node App to EC2
+- name: Deploy Backend
+  uses: appleboy/ssh-action@v1.0.3
+  with:
+    host: ${{ secrets.EC2_HOST }}
+    username: ubuntu
+    key: ${{ secrets.EC2_SSH_KEY }}
+    port: 22
+    script: |
+      cd /home/ubuntu || exit 1
 
-on:
-  push:
-    branches:
-      - main
+      # Ensure Node & PM2
+      node -v
+      npm install -g pm2
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+      if [ ! -d "intern-back" ]; then
+        git clone https://github.com/MK60822/intern-back.git
+      fi
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      cd intern-back || exit 1
+      git pull origin main
 
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          script: |
-            cd /home/ubuntu || exit 1
+      echo "MONGO_URI=${{ secrets.MONGO_URI }}" > .env
+      echo "PORT=5000" >> .env
 
-            if [ ! -d "intern-back" ]; then
-              git clone https://github.com/MK60822/intern-back.git
-            fi
+      npm install
 
-            cd intern-back || exit 1
-            git pull origin main
-
-            echo "MONGO_URI=${{ secrets.MONGO_URI }}" > .env
-            echo "PORT=5000" >> .env
-
-            npm install
-            pm2 delete student-api || true
-            pm2 start server.js --name student-api
-            pm2 save
+      pm2 delete student-api || true
+      pm2 start server.js --name student-api
+      pm2 save
