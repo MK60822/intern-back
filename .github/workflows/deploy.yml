@@ -1,4 +1,4 @@
-- name: Deploy Backend
+- name: deploy
   uses: appleboy/ssh-action@v1.0.3
   with:
     host: ${{ secrets.EC2_HOST }}
