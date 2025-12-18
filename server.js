@@ -12,7 +12,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: ["https://intern-frontend-theta.vercel.app", "http://localhost:3000"],
+        origin: ["https://intern-frontend-dun.vercel.app", "http://localhost:3000"],
         methods: ["GET", "POST"]
     }
 });
@@ -23,7 +23,7 @@ global.io = io;
 // 1. Elite Security Middleware
 app.use(express.json({ limit: '10kb' })); // Prevent DoS attacks with large payloads
 app.use(cors({
-    origin: true,
+    origin: ["https://intern-frontend-dun.vercel.app", "http://localhost:3000"],
     credentials: true
 }));
 
